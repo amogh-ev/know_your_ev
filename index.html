@@ -116,19 +116,19 @@ const text={
 en:{
 title:"⚡ Know Your EV Charging Capability",
 subtitle:"Select your car make and model",
-note:"Charging speed depends on SOC, temperature and BMS logic. Speed reduces after 60–70%. Lower speed does NOT mean charger fault.",
+note:"Charging speed depends on SOC, temperature and BMS logic. Speed reduces after 75–80%. Lower speed does NOT mean charger fault.",
 footer:"Charger delivers certified DC power as per CCS standards."
 },
 hi:{
 title:"⚡ अपनी EV की चार्जिंग क्षमता जानें",
 subtitle:"गाड़ी का ब्रांड और मॉडल चुनें",
-note:"चार्जिंग स्पीड SOC, तापमान और BMS पर निर्भर करती है। 60–70% के बाद स्पीड कम होती है। कम स्पीड का मतलब चार्जर खराब नहीं है।",
+note:"चार्जिंग स्पीड SOC, तापमान और BMS पर निर्भर करती है। 75–80% के बाद स्पीड कम होती है। कम स्पीड का मतलब चार्जर खराब नहीं है।",
 footer:"यह चार्जर CCS मानकों के अनुसार प्रमाणित पावर देता है।"
 },
 mr:{
 title:"⚡ तुमच्या EV ची चार्जिंग क्षमता जाणून घ्या",
 subtitle:"गाडीचा ब्रँड आणि मॉडेल निवडा",
-note:"चार्जिंग स्पीड SOC, तापमान आणि BMS वर अवलंबून असते. 60–70% नंतर स्पीड कमी होते. कमी स्पीड म्हणजे चार्जरमध्ये बिघाड नाही.",
+note:"चार्जिंग स्पीड SOC, तापमान आणि BMS वर अवलंबून असते. 75–80% नंतर स्पीड कमी होते. कमी स्पीड म्हणजे चार्जरमध्ये बिघाड नाही.",
 footer:"हा चार्जर CCS मानकांनुसार प्रमाणित वीज पुरवतो."
 }
 };
@@ -177,7 +177,7 @@ vehicleSelect.addEventListener("change",()=>{
     document.getElementById("carName").innerText=brand+" "+car;
     document.getElementById("carVoltAmp").innerText=`Vehicle Limit: ${v} V × ${a} A`;
     document.getElementById("carMaxKW").innerText=`Vehicle Max DC Power: ~${carMaxKW} kW`;
-    document.getElementById("chargerSpecs").innerText=`Charger: ${CHARGER_MAX_AMP} A (Up to ${CHARGER_MAX_KW} kW)`;
+    document.getElementById("chargerSpecs").innerText=`Charger: ${v} V x ${CHARGER_MAX_AMP} A (Up to ${CHARGER_MAX_KW} kW)`;
     document.getElementById("expectedSpeed").innerText=`Expected Charging Speed Here: ~${expectedKW} kW`;
 });
 
