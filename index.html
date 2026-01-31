@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Know Your EV Charging Speed</title>
+
+<style>
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f4f6f8;
+        color: #222;
+        text-align: center;
+    }
+
+    .container {
+        padding: 20px;
+        max-width: 500px;
+        margin: auto;
+    }
+
+    h1 {
+        font-size: 26px;
+        margin-bottom: 10px;
+    }
+
+    p {
+        font-size: 15px;
+        color: #555;
+    }
+
+    select {
+        width: 100%;
+        padding: 15px;
+        font-size: 18px;
+        margin-top: 20px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+    }
+
+    .result-card {
+        margin-top: 25px;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        display: none;
+        text-align: left;
+    }
+
+    .result-card h2 {
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+
+    .big {
+        font-size: 22px;
+        font-weight: bold;
+        margin: 10px 0;
+    }
+
+    .note {
+        margin-top: 15px;
+        font-size: 14px;
+        color: #666;
+    }
+
+    .footer {
+        margin-top: 30px;
+        font-size: 13px;
+        color: #777;
+    }
+
+    @media (max-width: 480px) {
+        h1 { font-size: 22px; }
+        .big { font-size: 20px; }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>⚡ Know Your EV Charging Speed</h1>
+    <p>Select your vehicle to see the expected charging speed at this station</p>
+
+    <select id="vehicleSelect">
+        <option value="">-- Select Your EV --</option>
+    </select>
+
+    <div class="result-card" id="resultCard">
+        <h2 id="carName"></h2>
+
+        <div class="big" id="carMax"></div>
+        <div class="big" id="chargerMax"></div>
+        <div class="big" id="expectedSpeed"></div>
+
+        <div class="note">
+            Charging speed depends on vehicle limits, battery %, temperature and BMS logic.  
+            Speed reduces after 60–70% SOC.  
+            Lower speed does <b>NOT</b> indicate charger fault.
+        </div>
+    </div>
+
+    <div class="footer">
+        This charger delivers certified power as per CCS standards.
+    </div>
+</div>
+
+<script>
+    // 🔧 CHANGE THIS TO YOUR CHARGER RATING
+    const CHARGER_MAX_KW = 120;
+
+    const vehicles = {
+        "Tata Tiago EV": 25,
+        "Tata Tigor EV": 25,
+        "Tata Nexon EV (Prime/Max/Facelift)": 50,
+        "MG ZS EV": 55,
+        "Mahindra XUV400": 50,
+        "Hyundai Kona Electric": 75,
+        "BYD Atto 3": 88,
+        "BYD Seal": 150,
+        "Hyundai Ioniq 5": 220,
+        "Kia EV6": 240,
+        "Volvo XC40 Recharge": 150,
+        "BMW i4": 205,
+        "BMW iX": 195,
+        "Mercedes EQB": 100,
+        "Mercedes EQC": 110,
+        "Audi e-tron": 150,
+        "Citroen eC3": 15,
+        "Tata Punch EV": 50,
+        "MG Comet EV (AC only)": 3.3
+    };
+
+    const select = document.getElementById("vehicleSelect");
+    const resultCard = document.getElementById("resultCard");
+
+    for (let car in vehicles) {
+        let option = document.createElement("option");
+        option.value = car;
+        option.textContent = car;
+        select.appendChild(option);
+    }
+
+    select.addEventListener("change", function () {
+        const car = this.value;
+        if (!car) {
+            resultCard.style.display = "none";
+            return;
+        }
+
+        const carMax = vehicles[car];
+        const expected = Math.min(carMax, CHARGER_MAX_KW);
+
+        document.getElementById("carName").innerText = car;
+        document.getElementById("carMax").innerText = "Your car's max DC speed: " + carMax + " kW";
+        document.getElementById("chargerMax").innerText = "Charger capacity: up to " + CHARGER_MAX_KW + " kW";
+        document.getElementById("expectedSpeed").innerText = "Expected charging speed here: ~" + expected + " kW";
+
+        resultCard.style.display = "block";
+    });
+</script>
+
+</body>
+</html>
