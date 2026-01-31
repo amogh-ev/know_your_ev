@@ -143,4 +143,51 @@ Object.keys(data).sort().forEach(brand=>{
     brandSelect.appendChild(opt);
 });
 
-brandSelect.addEventListener("change",()
+brandSelect.addEventListener("change",()=>{
+    vehicleSelect.innerHTML='<option value="">-- Select Vehicle --</option>';
+    const brand=brandSelect.value;
+    if(!brand){vehicleSelect.disabled=true;return;}
+    Object.keys(data[brand]).sort().forEach(car=>{
+        let opt=document.createElement("option");
+        opt.value=car;
+        opt.textContent=car;
+        vehicleSelect.appendChild(opt);
+    });
+    vehicleSelect.disabled=false;
+});
+
+vehicleSelect.addEventListener("change",()=>{
+    const brand=brandSelect.value;
+    const car=vehicleSelect.value;
+    if(!car) return;
+
+    const v=data[brand][car].v;
+    const a=data[brand][car].a;
+
+    const carMaxKW=(v*a/1000).toFixed(1);
+
+    const usableVolt=Math.min(v,CHARGER_MAX_VOLT);
+    const usableAmp=Math.min(a,CHARGER_MAX_AMP);
+    const expectedKW=(usableVolt*usableAmp/1000).toFixed(1);
+
+    document.getElementById("resultCard").style.display="block";
+    document.getElementById("carName").innerText=brand+" "+car;
+    document.getElementById("carVoltAmp").innerText=`Vehicle Limit: ${v} V × ${a} A`;
+    document.getElementById("carMaxKW").innerText=`Vehicle Max DC Power: ~${carMaxKW} kW`;
+    document.getElementById("chargerSpecs").innerText=`Charger: ${CHARGER_MAX_VOLT} V × ${CHARGER_MAX_AMP} A (Up to ${CHARGER_MAX_KW} kW)`;
+    document.getElementById("expectedSpeed").innerText=`Expected Charging Speed Here: ~${expectedKW} kW`;
+});
+
+// -------- Language Switch --------
+function setLang(lang){
+    currentLang=lang;
+    document.getElementById("title").innerText=text[lang].title;
+    document.getElementById("subtitle").innerText=text[lang].subtitle;
+    document.getElementById("note").innerText=text[lang].note;
+    document.getElementById("footer").innerText=text[lang].footer;
+}
+setLang("en");
+</script>
+
+</body>
+</html>
