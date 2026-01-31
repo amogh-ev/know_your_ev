@@ -169,9 +169,16 @@ vehicleSelect.addEventListener("change",()=>{
 
     const carMaxKW=(v*a/1000).toFixed(1);
 
-    const usableVolt=Math.min(v,CHARGER_MAX_VOLT);
-    const usableAmp=Math.min(a,CHARGER_MAX_AMP);
-    const expectedKW=(usableVolt*usableAmp/1000).toFixed(1);
+    const usableVolt = Math.min(v, CHARGER_MAX_VOLT);
+    const usableAmp = Math.min(a, CHARGER_MAX_AMP);
+
+// Theoretical power from V × A
+let expectedKW = (usableVolt * usableAmp) / 1000;
+
+// Hard cap by charger kW rating
+expectedKW = Math.min(expectedKW, CHARGER_MAX_KW);
+
+expectedKW = expectedKW.toFixed(1);
 
     document.getElementById("resultCard").style.display="block";
     document.getElementById("carName").innerText=brand+" "+car;
