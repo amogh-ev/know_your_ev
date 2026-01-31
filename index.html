@@ -177,7 +177,7 @@ vehicleSelect.addEventListener("change",()=>{
     document.getElementById("carName").innerText=brand+" "+car;
     document.getElementById("carVoltAmp").innerText=`Vehicle Limit: ${v} V × ${a} A`;
     document.getElementById("carMaxKW").innerText=`Vehicle Max DC Power: ~${carMaxKW} kW`;
-    document.getElementById("chargerSpecs").innerText=`Charger: ${CHARGER_MAX_VOLT} V × ${CHARGER_MAX_AMP} A (Up to ${CHARGER_MAX_KW} kW)`;
+    document.getElementById("chargerSpecs").innerText=`Charger: ${CHARGER_MAX_AMP} A (Up to ${CHARGER_MAX_KW} kW)`;
     document.getElementById("expectedSpeed").innerText=`Expected Charging Speed Here: ~${expectedKW} kW`;
 });
 
