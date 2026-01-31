@@ -3,166 +3,144 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Know Your EV Charging Speed</title>
+<title>EV Charging Info</title>
 
 <style>
-    body {
-        font-family: Arial, Helvetica, sans-serif;
-        margin: 0;
-        padding: 0;
-        background: #f4f6f8;
-        color: #222;
-        text-align: center;
-    }
-
-    .container {
-        padding: 20px;
-        max-width: 500px;
-        margin: auto;
-    }
-
-    h1 {
-        font-size: 26px;
-        margin-bottom: 10px;
-    }
-
-    p {
-        font-size: 15px;
-        color: #555;
-    }
-
-    select {
-        width: 100%;
-        padding: 15px;
-        font-size: 18px;
-        margin-top: 20px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-    }
-
-    .result-card {
-        margin-top: 25px;
-        padding: 20px;
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        display: none;
-        text-align: left;
-    }
-
-    .result-card h2 {
-        font-size: 20px;
-        margin-bottom: 10px;
-    }
-
-    .big {
-        font-size: 22px;
-        font-weight: bold;
-        margin: 10px 0;
-    }
-
-    .note {
-        margin-top: 15px;
-        font-size: 14px;
-        color: #666;
-    }
-
-    .footer {
-        margin-top: 30px;
-        font-size: 13px;
-        color: #777;
-    }
-
-    @media (max-width: 480px) {
-        h1 { font-size: 22px; }
-        .big { font-size: 20px; }
-    }
+body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#f4f6f8;text-align:center;color:#222;}
+.container{max-width:520px;margin:auto;padding:18px;}
+h1{font-size:24px;margin-bottom:8px;}
+select,button{width:100%;padding:14px;font-size:17px;margin-top:12px;border-radius:8px;border:1px solid #ccc;}
+.lang-btns button{width:32%;font-size:14px;}
+.result-card{margin-top:20px;padding:18px;background:white;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.08);display:none;text-align:left;}
+.big{font-size:19px;font-weight:bold;margin:6px 0;}
+.note{font-size:13px;color:#666;margin-top:10px;}
+.footer{margin-top:22px;font-size:12px;color:#777;}
 </style>
 </head>
 
 <body>
-
 <div class="container">
-    <h1>⚡ Know Your EV Charging Speed</h1>
-    <p>Select your vehicle to see the expected charging speed at this station</p>
 
-    <select id="vehicleSelect">
-        <option value="">-- Select Your EV --</option>
-    </select>
+<div class="lang-btns">
+<button onclick="setLang('en')">English</button>
+<button onclick="setLang('hi')">हिन्दी</button>
+<button onclick="setLang('mr')">मराठी</button>
+</div>
 
-    <div class="result-card" id="resultCard">
-        <h2 id="carName"></h2>
+<h1 id="title"></h1>
+<p id="subtitle"></p>
 
-        <div class="big" id="carMax"></div>
-        <div class="big" id="chargerMax"></div>
-        <div class="big" id="expectedSpeed"></div>
+<select id="brandSelect">
+<option value="">-- Select Car Make --</option>
+</select>
 
-        <div class="note">
-            Charging speed depends on vehicle limits, battery %, temperature and BMS logic.  
-            Speed reduces after 60–70% SOC.  
-            Lower speed does <b>NOT</b> indicate charger fault.
-        </div>
-    </div>
+<select id="vehicleSelect" disabled>
+<option value="">-- Select Vehicle --</option>
+</select>
 
-    <div class="footer">
-        This charger delivers certified power as per CCS standards.
-    </div>
+<div class="result-card" id="resultCard">
+<h2 id="carName"></h2>
+
+<div class="big" id="carVoltAmp"></div>
+<div class="big" id="carMaxKW"></div>
+
+<hr>
+
+<div class="big" id="chargerSpecs"></div>
+<div class="big" id="expectedSpeed"></div>
+
+<div class="note" id="note"></div>
+</div>
+
+<div class="footer" id="footer"></div>
+
 </div>
 
 <script>
-    // 🔧 CHANGE THIS TO YOUR CHARGER RATING
-    const CHARGER_MAX_KW = 120;
+// ------------ EDIT THESE -------------
+const CHARGER_MAX_KW = 120;
+const CHARGER_MAX_VOLT = 1000;
+const CHARGER_MAX_AMP = 200;
+// ------------------------------------
 
-    const vehicles = {
-        "Tata Tiago EV": 25,
-        "Tata Tigor EV": 25,
-        "Tata Nexon EV (Prime/Max/Facelift)": 50,
-        "MG ZS EV": 55,
-        "Mahindra XUV400": 50,
-        "Hyundai Kona Electric": 75,
-        "BYD Atto 3": 88,
-        "BYD Seal": 150,
-        "Hyundai Ioniq 5": 220,
-        "Kia EV6": 240,
-        "Volvo XC40 Recharge": 150,
-        "BMW i4": 205,
-        "BMW iX": 195,
-        "Mercedes EQB": 100,
-        "Mercedes EQC": 110,
-        "Audi e-tron": 150,
-        "Citroen eC3": 15,
-        "Tata Punch EV": 50,
-        "MG Comet EV (AC only)": 3.3
-    };
+// Vehicle data: Max DC Voltage & Current
+const data = {
+"Tata":{
+    "Tiago EV":{v:350,a:80},
+    "Tigor EV":{v:350,a:80},
+    "Nexon EV":{v:380,a:135},
+    "Punch EV":{v:380,a:135}
+},
+"MG":{
+    "ZS EV":{v:400,a:150},
+    "Comet EV (AC only)":{v:230,a:15}
+},
+"Mahindra":{
+    "XUV400":{v:380,a:140}
+},
+"Hyundai":{
+    "Kona Electric":{v:400,a:190},
+    "Ioniq 5":{v:800,a:300}
+},
+"Kia":{
+    "EV6":{v:800,a:300}
+},
+"BYD":{
+    "Atto 3":{v:400,a:220},
+    "Seal":{v:800,a:250}
+},
+"Citroen":{
+    "eC3":{v:320,a:50}
+},
+"BMW":{
+    "i4":{v:800,a:260},
+    "iX":{v:800,a:250}
+},
+"Mercedes":{
+    "EQB":{v:400,a:250},
+    "EQC":{v:400,a:275}
+},
+"Audi":{
+    "e-tron":{v:400,a:375}
+},
+"Volvo":{
+    "XC40 Recharge":{v:400,a:375}
+}
+};
 
-    const select = document.getElementById("vehicleSelect");
-    const resultCard = document.getElementById("resultCard");
+// -------- Language Text --------
+const text={
+en:{
+title:"⚡ Know Your EV Charging Capability",
+subtitle:"Select your car make and model",
+note:"Charging speed depends on SOC, temperature and BMS logic. Speed reduces after 60–70%. Lower speed does NOT mean charger fault.",
+footer:"Charger delivers certified DC power as per CCS standards."
+},
+hi:{
+title:"⚡ अपनी EV की चार्जिंग क्षमता जानें",
+subtitle:"गाड़ी का ब्रांड और मॉडल चुनें",
+note:"चार्जिंग स्पीड SOC, तापमान और BMS पर निर्भर करती है। 60–70% के बाद स्पीड कम होती है। कम स्पीड का मतलब चार्जर खराब नहीं है।",
+footer:"यह चार्जर CCS मानकों के अनुसार प्रमाणित पावर देता है।"
+},
+mr:{
+title:"⚡ तुमच्या EV ची चार्जिंग क्षमता जाणून घ्या",
+subtitle:"गाडीचा ब्रँड आणि मॉडेल निवडा",
+note:"चार्जिंग स्पीड SOC, तापमान आणि BMS वर अवलंबून असते. 60–70% नंतर स्पीड कमी होते. कमी स्पीड म्हणजे चार्जरमध्ये बिघाड नाही.",
+footer:"हा चार्जर CCS मानकांनुसार प्रमाणित वीज पुरवतो."
+}
+};
 
-    for (let car in vehicles) {
-        let option = document.createElement("option");
-        option.value = car;
-        option.textContent = car;
-        select.appendChild(option);
-    }
+let currentLang="en";
 
-    select.addEventListener("change", function () {
-        const car = this.value;
-        if (!car) {
-            resultCard.style.display = "none";
-            return;
-        }
+// -------- Init Brand List (Sorted) --------
+const brandSelect=document.getElementById("brandSelect");
+const vehicleSelect=document.getElementById("vehicleSelect");
 
-        const carMax = vehicles[car];
-        const expected = Math.min(carMax, CHARGER_MAX_KW);
+Object.keys(data).sort().forEach(brand=>{
+    let opt=document.createElement("option");
+    opt.value=brand;
+    opt.textContent=brand;
+    brandSelect.appendChild(opt);
+});
 
-        document.getElementById("carName").innerText = car;
-        document.getElementById("carMax").innerText = "Your car's max DC speed: " + carMax + " kW";
-        document.getElementById("chargerMax").innerText = "Charger capacity: up to " + CHARGER_MAX_KW + " kW";
-        document.getElementById("expectedSpeed").innerText = "Expected charging speed here: ~" + expected + " kW";
-
-        resultCard.style.display = "block";
-    });
-</script>
-
-</body>
-</html>
+brandSelect.addEventListener("change",()
